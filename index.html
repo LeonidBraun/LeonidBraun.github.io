@@ -15,7 +15,8 @@
     <script>
 
       var canvas = document.getElementById('canvas');
-
+      canvas.width = 500;
+      canvas.height = 500;
       var context = canvas.getContext('2d');
 
       // Set the initial position and velocity of the ball
@@ -28,7 +29,11 @@
 
         vx: 0,
 
-        vy: 0
+        vy: 0,
+        
+        ax = 0,
+        
+        ay = 0
 
       };
 
@@ -36,27 +41,31 @@
 
       window.addEventListener('devicemotion', function(event) {
 
-        ball.vx = -event.accelerationIncludingGravity.x;
+        ball.ax = -event.accelerationIncludingGravity.x;
 
 
-        ball.vy = event.accelerationIncludingGravity.y;
-
-      });
-
-      window.addEventListener('deviceorientation', function(event) {
-
-        ball.vx += event.gamma / 10;
-
-        ball.vy += event.beta / 10;
+        ball.ay = event.accelerationIncludingGravity.y;
 
       });
+
+      // window.addEventListener('deviceorientation', function(event) {
+
+        // ball.vx += event.gamma / 10;
+
+        // ball.vy += event.beta / 10;
+
+      // });
 
       // Update the position of the ball on the canvas
 
       function update() {
 
         // Apply the velocity to the position
-
+        
+        ball.vx += ball.ax;
+        
+        ball.vy += ball.ay;
+        
         ball.x += ball.vx;
 
         ball.y += ball.vy;
@@ -67,13 +76,13 @@
 
           ball.x = 0;
 
-          ball.vx = -ball.vx;
+          ball.vx = -0.9*ball.vx;
 
         } else if (ball.x > canvas.width) {
 
           ball.x = canvas.width;
 
-          ball.vx = -ball.vx;
+          ball.vx = -0.9*ball.vx;
 
         }
 
@@ -81,13 +90,13 @@
 
           ball.y = 0;
 
-          ball.vy = -ball.vy;
+          ball.vy = -0.9*ball.vy;
 
         } else if (ball.y > canvas.height) {
 
           ball.y = canvas.height;
 
-          ball.vy = -ball.vy;
+          ball.vy = -0.9*ball.vy;
 
         }
 
