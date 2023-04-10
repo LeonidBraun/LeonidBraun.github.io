@@ -59,17 +59,25 @@
 
       // Update the position of the ball on the canvas
 
-      function update() {
+      var last_time = null;
+
+      function update(time) {
+        if(!last_time){
+           last_time = time;
+           requestAnimationFrame(update);
+        }
+        var dt = time - last_time;
+        last_time = time;
 
         // Apply the velocity to the position
         
-        ball.vx += ball.ax;
+        ball.vx += dt * ball.ax;
         
-        ball.vy += ball.ay;
+        ball.vy += dt * ball.ay;
         
-        ball.x += ball.vx;
+        ball.x += dt * ball.vx;
 
-        ball.y += ball.vy;
+        ball.y += dt * ball.vy;
 
         // Keep the ball within the canvas bounds
 
