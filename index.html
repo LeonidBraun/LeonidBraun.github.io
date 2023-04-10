@@ -36,7 +36,8 @@
 
       window.addEventListener('devicemotion', function(event) {
 
-        ball.vx = event.accelerationIncludingGravity.x;
+        ball.vx = -event.accelerationIncludingGravity.x;
+
 
         ball.vy = event.accelerationIncludingGravity.y;
 
