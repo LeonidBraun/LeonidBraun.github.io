@@ -41,11 +41,11 @@
 
       window.addEventListener('devicemotion', function(event) {
 
-        //ball.ax = -event.accelerationIncludingGravity.x;
-        ball.ax = -event.acceleration.x;
+        ball.ax = -event.accelerationIncludingGravity.x;
+        //ball.ax = -event.acceleration.x;
 
 
-        ball.ay = event.acceleration.y;
+        ball.ay = event.accelerationIncludingGravity.y;
 
       });
 
