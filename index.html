@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+
+    <title>Accelerometer Ball</title>
+
+  </head>
+
+  <body>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+
+      var canvas = document.getElementById('canvas');
+
+      var context = canvas.getContext('2d');
+
+      // Set the initial position and velocity of the ball
+
+      var ball = {
+
+        x: canvas.width / 2,
+
+        y: canvas.height / 2,
+
+        vx: 0,
+
+        vy: 0
+
+      };
+
+      // Capture the accelerometer and gyroscope data
+
+      window.addEventListener('devicemotion', function(event) {
+
+        ball.vx = event.accelerationIncludingGravity.x;
+
+        ball.vy = event.accelerationIncludingGravity.y;
+
+      });
+
+      window.addEventListener('deviceorientation', function(event) {
+
+        ball.vx += event.gamma / 10;
+
+        ball.vy += event.beta / 10;
+
+      });
+
+      // Update the position of the ball on the canvas
+
+      function update() {
+
+        // Apply the velocity to the position
+
+        ball.x += ball.vx;
+
+        ball.y += ball.vy;
+
+        // Keep the ball within the canvas bounds
+
+        if (ball.x < 0) {
+
+          ball.x = 0;
+
+          ball.vx = -ball.vx;
+
+        } else if (ball.x > canvas.width) {
+
+          ball.x = canvas.width;
+
+          ball.vx = -ball.vx;
+
+        }
+
+        if (ball.y < 0) {
+
+          ball.y = 0;
+
+          ball.vy = -ball.vy;
+
+        } else if (ball.y > canvas.height) {
+
+          ball.y = canvas.height;
+
+          ball.vy = -ball.vy;
+
+        }
+
+        // Clear the canvas and redraw the ball
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        context.beginPath();
+
+        context.arc(ball.x, ball.y, 20, 0, Math.PI * 2);
+
+        context.fill();
+
+        // Request the next frame
+
+        requestAnimationFrame(update);
+
+      }
+
+      // Start the animation loop
+
+      requestAnimationFrame(update);
+
+    </script>
+
+  </body>
+
+</html>
