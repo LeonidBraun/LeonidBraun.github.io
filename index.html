@@ -41,7 +41,7 @@
     for (let i = 0; i < N; i++) {
       x.push(7 * m + 4 * m * Math.cos(2 * Math.PI * i / N));
       y.push(7 * m + 5 * m * Math.sin(2 * Math.PI * i / N));
-      vx.push(0 * m * Math.sin(2 * Math.PI * i / N) + 0.8 * m);
+      vx.push(0 * m * Math.sin(2 * Math.PI * i / N) - 0.2 * m);
       vy.push(-0 * m * Math.cos(2 * Math.PI * i / N) - 0.1 * m);
       ax.push(0.);
       ay.push(0.);
@@ -60,7 +60,7 @@
       last_time = time;
       // Apply the velocity to the position
 
-      for (let it = 0; it < 5; it++) {
+      for (let it = 0; it < 8; it++) {
         time_step(0.5 * dt);
       }
 
@@ -116,9 +116,9 @@
           // Keep the ball within the canvas bounds
           if (x[i] < 0) {
             x[i] = 0;
-            // vx[i] = -0.9 * vx[i];
+            vx[i] = -0.9 * vx[i];
             vy[i] -= 0.9 * Math.sign(vy[i]) * Math.abs(vx[i]);
-            vy[i] = -0.9 * vy[i];
+            // vy[i] = -0.9 * vy[i];
           } else if (x[i] > canvas.width) {
             x[i] = canvas.width;
             vx[i] = -0.9 * vx[i];
