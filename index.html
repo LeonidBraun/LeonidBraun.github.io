@@ -1,136 +1,144 @@
 <!DOCTYPE html>
-
 <html>
 
-  <head>
+<head>
+  <title>Accelerometer Ball</title>
+</head>
 
-    <title>Accelerometer Ball</title>
+<body>
+  <canvas id="canvas" style="border:1px solid #d3d3d3;"></canvas>
+  <script>
+    var canvas = document.getElementById('canvas');
+    canvas.width = 500;
+    canvas.height = 500;
+    var context = canvas.getContext('2d');
+    // Set the initial position and velocity of the ball
+    var gx = 0.;
+    var gy = 0.;
 
-  </head>
+    // Capture the accelerometer and gyroscope data
+    window.addEventListener('devicemotion', function (event) {
+      gx = -event.accelerationIncludingGravity.x;
+      //ball.ax = -event.acceleration.x;
+      gy = event.accelerationIncludingGravity.y;
+    });
+    // window.addEventListener('deviceorientation', function(event) {
+    // ball.vx += event.gamma / 10;
+    // ball.vy += event.beta / 10;
+    // });
 
-  <body>
-
-    <canvas id="canvas" border="1px"></canvas>
-
-    <script>
-
-      var canvas = document.getElementById('canvas');
-      canvas.width = 500;
-      canvas.height = 500;
-      var context = canvas.getContext('2d');
-
-      // Set the initial position and velocity of the ball
-
-      var ball = {
-
-        x: canvas.width / 2,
-
-        y: canvas.height / 2,
-
-        vx: 0,
-
-        vy: 0,
-        
-        ax: 0,
-        
-        ay: 0
-
-      };
-
-      // Capture the accelerometer and gyroscope data
-
-      window.addEventListener('devicemotion', function(event) {
-
-        ball.ax = -event.accelerationIncludingGravity.x;
-        //ball.ax = -event.acceleration.x;
+    var x = [];
+    var y = [];
+    var vx = [];
+    var vy = [];
+    var ax = [];
+    var ay = [];
 
 
-        ball.ay = event.accelerationIncludingGravity.y;
+    const m = canvas.height / 2;
 
-      });
+    N = 30
+    for (let i = 0; i < N; i++) {
+      x.push(m + 0.4 * m * Math.cos(2 * Math.PI * i / N));
+      y.push(m + 0.4 * m * Math.sin(2 * Math.PI * i / N));
+      vx.push(0 * m * Math.sin(2 * Math.PI * i / N) - 0.2 * m);
+      vy.push(-0 * m * Math.cos(2 * Math.PI * i / N) - 0.1 * m);
+      ax.push(0.);
+      ay.push(0.);
+    }
 
-      // window.addEventListener('deviceorientation', function(event) {
 
-        // ball.vx += event.gamma / 10;
 
-        // ball.vy += event.beta / 10;
-
-      // });
-
-      // Update the position of the ball on the canvas
-
-      var last_time = null;
-
-      function update(time) {
-        if(!last_time){
-           last_time = time;
-           requestAnimationFrame(update);
-        }
-        var dt = 30. * (time - last_time)/1000.;
+    // Update the position of the ball on the canvas
+    var last_time = null;
+    function update(time) {
+      if (!last_time) {
         last_time = time;
-
-        // Apply the velocity to the position
-        
-        ball.vx += dt * ball.ax;
-        
-        ball.vy += dt * ball.ay;
-        
-        ball.x += dt * ball.vx;
-
-        ball.y += dt * ball.vy;
-
-        // Keep the ball within the canvas bounds
-
-        if (ball.x < 0) {
-
-          ball.x = 0;
-
-          ball.vx = -0.9*ball.vx;
-
-        } else if (ball.x > canvas.width) {
-
-          ball.x = canvas.width;
-
-          ball.vx = -0.9*ball.vx;
-
-        }
-
-        if (ball.y < 0) {
-
-          ball.y = 0;
-
-          ball.vy = -0.9*ball.vy;
-
-        } else if (ball.y > canvas.height) {
-
-          ball.y = canvas.height;
-
-          ball.vy = -0.9*ball.vy;
-
-        }
-
-        // Clear the canvas and redraw the ball
-
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
-        context.beginPath();
-
-        context.arc(ball.x, ball.y, 20, 0, Math.PI * 2);
-
-        context.fill();
-
-        // Request the next frame
-
         requestAnimationFrame(update);
+      }
+      var dt = 1. * (time - last_time) / 1000.;
+      last_time = time;
+      // Apply the velocity to the position
 
+      for (let i = 0; i < N; i++) {
+        const nx = x[(i + 1) % N];
+        const ny = y[(i + 1) % N];
+        const px = x[(i + N - 1) % N];
+        const py = y[(i + N - 1) % N];
+
+        const l0 = 0.1 * m;
+        const l_f = -1000.;
+        // const P =
+
+        ax[i] = 0.;
+        ay[i] = 0.;
+
+        var dx = nx - x[i];
+        var dy = ny - y[i];
+        var l = Math.sqrt(dx * dx + dy * dy);
+        ax[i] += l_f * (l0 - l) * dx / l + dy;
+        ay[i] += l_f * (l0 - l) * dy / l - dx;
+
+        var dx = px - x[i];
+        var dy = py - y[i];
+        var l = Math.sqrt(dx * dx + dy * dy);
+        ax[i] += l_f * (l0 - l) * dx / l - dy;
+        ay[i] += l_f * (l0 - l) * dy / l + dx;
       }
 
-      // Start the animation loop
+      for (let i = 0; i < N; i++) {
 
+        vx[i] += dt * (ax[i]);
+        vy[i] += dt * (ay[i]);
+        x[i] += dt * vx[i] + dt * dt * ax[i];
+        y[i] += dt * vy[i] + dt * dt * ay[i];
+        // Keep the ball within the canvas bounds
+        if (x[i] < 0) {
+          x[i] = 0;
+          vx[i] = -0.9 * vx[i];
+        } else if (x[i] > canvas.width) {
+          x[i] = canvas.width;
+          vx[i] = -0.9 * vx[i];
+        }
+        if (y[i] < 0) {
+          y[i] = 0;
+          vy[i] = -0.9 * vy[i];
+        } else if (y[i] > canvas.height) {
+          y[i] = canvas.height;
+          vy[i] = -0.9 * vy[i];
+        }
+        // Clear the canvas and redraw the ball
+        // context.beginPath();
+        // context.arc(x[i], y[i], 10, 0, Math.PI * 2);
+        // context.fill();
+        // // context.beginPath();
+        // context.moveTo(x[i], y[i]);
+        // context.lineTo(nx, ny);
+      }
+
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.beginPath();
+      context.fillStyle = 'grey';
+      context.moveTo(x[N], y[N]);
+      for (let i = 0; i < N; i++) {
+        context.lineTo(x[i], y[i]);
+      }
+      // context.closePath();
+      context.fill();
+      for (let i = 0; i < N; i++) {
+        context.beginPath();
+        context.fillStyle = 'black';
+        context.arc(x[i], y[i], 4, 0, Math.PI * 2);
+        context.fill();
+      }
+      // context.closePath();
+      // context.fill();
+      // Request the next frame
       requestAnimationFrame(update);
-
-    </script>
-
-  </body>
+    }
+    // Start the animation loop
+    requestAnimationFrame(update);
+  </script>
+</body>
 
 </html>
