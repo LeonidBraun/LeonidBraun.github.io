@@ -14,7 +14,7 @@
     var context = canvas.getContext('2d');
     // Set the initial position and velocity of the ball
     var gx = 0.;
-    var gy = 0.;
+    var gy = 10.;
 
     // Capture the accelerometer and gyroscope data
     window.addEventListener('devicemotion', function (event) {
@@ -105,8 +105,8 @@
 
       for (let i = 0; i < N; i++) {
 
-        vx[i] += dt * (ax[i] + gx * m + 0.2 * m);
-        vy[i] += dt * (ay[i] + gy * m + 10 * m);
+        vx[i] += dt * (ax[i] + gx * m);
+        vy[i] += dt * (ay[i] + gy * m);
         x[i] += dt * vx[i];// + 0.5 * dt * dt * ax[i];
         y[i] += dt * vy[i];// + 0.5 * dt * dt * ay[i];
         // Keep the ball within the canvas bounds
