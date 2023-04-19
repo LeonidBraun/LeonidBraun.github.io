@@ -37,7 +37,7 @@
 
     const m = canvas.width / 30;
 
-    N = 100
+    N = 500
     for (let i = 0; i < N; i++) {
       x.push(27 * m + 4 * m * Math.cos(2 * Math.PI * i / N));
       y.push(7 * m + 5 * m * Math.sin(2 * Math.PI * i / N));
@@ -63,7 +63,7 @@
       const dt_t = 0.008 / N
       var it_number = Math.ceil(dt / dt_t);
       // 0.008
-      it_number = Math.max(it_number, 100)
+      it_number = Math.min(it_number, 100)
       for (let it = 0; it < 3 * it_number; it++) {
         time_step(dt / it_number);
       }
