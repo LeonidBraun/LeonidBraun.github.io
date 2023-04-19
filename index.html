@@ -41,7 +41,7 @@
     for (let i = 0; i < N; i++) {
       x.push(7 * m + 4 * m * Math.cos(2 * Math.PI * i / N));
       y.push(7 * m + 5 * m * Math.sin(2 * Math.PI * i / N));
-      vx.push(0 * m * Math.sin(2 * Math.PI * i / N) - 0.8 * m);
+      vx.push(0 * m * Math.sin(2 * Math.PI * i / N) + 0.8 * m);
       vy.push(-0 * m * Math.cos(2 * Math.PI * i / N) - 0.1 * m);
       ax.push(0.);
       ay.push(0.);
@@ -60,77 +60,82 @@
       last_time = time;
       // Apply the velocity to the position
 
-
-      var A = 0.0;
-      for (let i = 0; i < N; i++) {
-
-        const n = (i + 1) % N;
-        const p = (i + N - 1) % N;
-        var dx = x[n] - x[i];
-        var dy = y[n] - y[i];
-        var mx = x[n] + x[i];
-        var my = y[n] + y[i];
-        A += dx * my - dy * mx;
-      }
-      A *= -0.25;
-      // console.log(A);
-      const prs = -0.01 * (A - 70 * m * m) / m * m;
-
-      for (let i = 0; i < N; i++) {
-
-        const n = (i + 1) % N;
-        const p = (i + N - 1) % N;
-
-        const l0 = 1 * m;
-        const l_f = -500;
-        const visc = 20;
-
-        ax[i] = prs * (y[n] - y[p]);
-        ay[i] = -prs * (x[n] - x[p]);
-
-        var dx = x[n] - x[i];
-        var dy = y[n] - y[i];
-        var l = Math.sqrt(dx * dx + dy * dy);
-        var dv = ((vx[n] - vx[i]) * dx + (vy[n] - vy[i]) * dy) / l;
-        ax[i] += l_f * (l0 - l) * dx / l + visc * dv * dx / l;
-        ay[i] += l_f * (l0 - l) * dy / l + visc * dv * dy / l;
-
-        dx = x[p] - x[i];
-        dy = y[p] - y[i];
-        l = Math.sqrt(dx * dx + dy * dy);
-        var dv = ((vx[p] - vx[i]) * dx + (vy[p] - vy[i]) * dy) / l;
-        ax[i] += l_f * (l0 - l) * dx / l + visc * dv * dx / l;
-        ay[i] += l_f * (l0 - l) * dy / l + visc * dv * dy / l;
+      for (let it = 0; it < 5; it++) {
+        time_step(0.5 * dt);
       }
 
-      for (let i = 0; i < N; i++) {
+      function time_step(dt) {
+        var A = 0.0;
+        for (let i = 0; i < N; i++) {
 
-        vx[i] += dt * (ax[i] + gx * m);
-        vy[i] += dt * (ay[i] + gy * m);
-        x[i] += dt * vx[i];// + 0.5 * dt * dt * ax[i];
-        y[i] += dt * vy[i];// + 0.5 * dt * dt * ay[i];
-        // Keep the ball within the canvas bounds
-        if (x[i] < 0) {
-          x[i] = 0;
-          vx[i] = -0.9 * vx[i];
-          // vy[i] -= 0.9 * Math.sign(vy[i]) * Math.abs(vx[i]);
-          vy[i] = -0.9 * vy[i];
-        } else if (x[i] > canvas.width) {
-          x[i] = canvas.width;
-          vx[i] = -0.9 * vx[i];
-          // vy[i] -= 0.9 * Math.sign(vy[i]) * Math.abs(vx[i]);
-          vy[i] = -0.9 * vy[i];
+          const n = (i + 1) % N;
+          const p = (i + N - 1) % N;
+          var dx = x[n] - x[i];
+          var dy = y[n] - y[i];
+          var mx = x[n] + x[i];
+          var my = y[n] + y[i];
+          A += dx * my - dy * mx;
         }
-        if (y[i] < 0) {
-          y[i] = 0;
-          vy[i] = -0.9 * vy[i];
-          vx[i] = -0.9 * vx[i];
-          // vx[i] -= 0.9 * Math.sign(vx[i]) * Math.abs(vy[i]);
-        } else if (y[i] > canvas.height) {
-          y[i] = canvas.height;
-          vy[i] = -0.9 * vy[i];
-          vx[i] = -0.9 * vx[i];
-          // vx[i] -= 0.9 * Math.sign(vx[i]) * Math.abs(vy[i]);
+        A *= -0.25;
+        console.log(A / (m * m));
+        const prs = -0.1 * (A - 60 * m * m) / m * m;
+
+        for (let i = 0; i < N; i++) {
+
+          const n = (i + 1) % N;
+          const p = (i + N - 1) % N;
+
+          const l0 = 1 * m;
+          const l_f = -2000;
+          const visc = 20;
+
+          ax[i] = prs * (y[n] - y[p]);
+          ay[i] = -prs * (x[n] - x[p]);
+
+          var dx = x[n] - x[i];
+          var dy = y[n] - y[i];
+          var l = Math.sqrt(dx * dx + dy * dy);
+          var dv = ((vx[n] - vx[i]) * dx + (vy[n] - vy[i]) * dy) / l;
+          ax[i] += l_f * (l0 - l) * dx / l + visc * dv * dx / l;
+          ay[i] += l_f * (l0 - l) * dy / l + visc * dv * dy / l;
+
+          dx = x[p] - x[i];
+          dy = y[p] - y[i];
+          l = Math.sqrt(dx * dx + dy * dy);
+          var dv = ((vx[p] - vx[i]) * dx + (vy[p] - vy[i]) * dy) / l;
+          ax[i] += l_f * (l0 - l) * dx / l + visc * dv * dx / l;
+          ay[i] += l_f * (l0 - l) * dy / l + visc * dv * dy / l;
+        }
+
+        for (let i = 0; i < N; i++) {
+
+          vx[i] += dt * (ax[i] + gx * m);
+          vy[i] += dt * (ay[i] + gy * m);
+          x[i] += dt * vx[i];// + 0.5 * dt * dt * ax[i];
+          y[i] += dt * vy[i];// + 0.5 * dt * dt * ay[i];
+          // Keep the ball within the canvas bounds
+          if (x[i] < 0) {
+            x[i] = 0;
+            // vx[i] = -0.9 * vx[i];
+            vy[i] -= 0.9 * Math.sign(vy[i]) * Math.abs(vx[i]);
+            vy[i] = -0.9 * vy[i];
+          } else if (x[i] > canvas.width) {
+            x[i] = canvas.width;
+            vx[i] = -0.9 * vx[i];
+            vy[i] -= 0.9 * Math.sign(vy[i]) * Math.abs(vx[i]);
+            // vy[i] = -0.9 * vy[i];
+          }
+          if (y[i] < 0) {
+            y[i] = 0;
+            vy[i] = -0.9 * vy[i];
+            // vx[i] = -0.9 * vx[i];
+            vx[i] -= 0.9 * Math.sign(vx[i]) * Math.abs(vy[i]);
+          } else if (y[i] > canvas.height) {
+            y[i] = canvas.height;
+            vy[i] = -0.9 * vy[i];
+            // vx[i] = -0.9 * vx[i];
+            vx[i] -= 0.9 * Math.sign(vx[i]) * Math.abs(vy[i]);
+          }
         }
       }
 
