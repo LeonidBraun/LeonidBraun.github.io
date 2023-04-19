@@ -65,7 +65,7 @@
       // 0.008
       it_number = Math.min(it_number, 100)
       for (let it = 0; it < 3 * it_number; it++) {
-        time_step(dt / it_number);
+        time_step(Math.min(dt / it_number, dt_t));
       }
 
       function time_step(dt) {
