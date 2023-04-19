@@ -13,7 +13,7 @@
     canvas.height = 500;
     var context = canvas.getContext('2d');
     // Set the initial position and velocity of the ball
-    var gx = 3.;
+    var gx = 1.;
     var gy = 9.;
 
     // Capture the accelerometer and gyroscope data
@@ -37,7 +37,7 @@
 
     const m = canvas.width / 30;
 
-    N = 500
+    N = 300
     for (let i = 0; i < N; i++) {
       x.push(27 * m + 4 * m * Math.cos(2 * Math.PI * i / N));
       y.push(7 * m + 5 * m * Math.sin(2 * Math.PI * i / N));
@@ -65,7 +65,7 @@
       // 0.008
       it_number = Math.min(it_number, 100)
       for (let it = 0; it < 3 * it_number; it++) {
-        time_step(Math.min(dt / it_number, dt_t));
+        time_step(Math.min(dt / it_number, 1.2 * dt_t));
       }
 
       function time_step(dt) {
