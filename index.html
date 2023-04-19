@@ -13,8 +13,8 @@
     canvas.height = 500;
     var context = canvas.getContext('2d');
     // Set the initial position and velocity of the ball
-    var gx = 0.;
-    var gy = 10.;
+    var gx = 3.;
+    var gy = 9.;
 
     // Capture the accelerometer and gyroscope data
     window.addEventListener('devicemotion', function (event) {
@@ -37,12 +37,12 @@
 
     const m = canvas.width / 30;
 
-    N = 30
+    N = 100
     for (let i = 0; i < N; i++) {
-      x.push(7 * m + 4 * m * Math.cos(2 * Math.PI * i / N));
+      x.push(27 * m + 4 * m * Math.cos(2 * Math.PI * i / N));
       y.push(7 * m + 5 * m * Math.sin(2 * Math.PI * i / N));
-      vx.push(0 * m * Math.sin(2 * Math.PI * i / N) - 0.2 * m);
-      vy.push(-0 * m * Math.cos(2 * Math.PI * i / N) - 0.1 * m);
+      vx.push(0 * 40 * m * Math.sin(2 * Math.PI * i / N) + 0.2 * m);
+      vy.push(- 0 * 40 * m * Math.cos(2 * Math.PI * i / N) + 0.1 * m);
       ax.push(0.);
       ay.push(0.);
     }
@@ -60,38 +60,51 @@
       last_time = time;
       // Apply the velocity to the position
 
-      var it_number = Math.ceil(dt / 0.004);
+      const dt_t = 0.008 / N
+      var it_number = Math.ceil(dt / dt_t);
       // 0.008
+      it_number = Math.max(it_number, 100)
       for (let it = 0; it < 3 * it_number; it++) {
         time_step(dt / it_number);
       }
 
       function time_step(dt) {
         var A = 0.0;
+        var mx = 0.0;
+        var my = 0.0;
         for (let i = 0; i < N; i++) {
 
           const n = (i + 1) % N;
           const p = (i + N - 1) % N;
           var dx = x[n] - x[i];
           var dy = y[n] - y[i];
-          var mx = x[n] + x[i];
-          var my = y[n] + y[i];
-          A += dx * my - dy * mx;
+          A += dx * y[i] - dy * x[i];
+
+          mx += x[i];
+          my += y[i];
         }
-        A *= -0.25;
-        const prs = -0.1 * (A - 60 * m * m) / m * m;
+        A *= -0.5;
+        mx /= N;
+        my /= N;
+        const prs = -0.1 * N * (A - 60 * m * m) / m * m;
 
         for (let i = 0; i < N; i++) {
 
           const n = (i + 1) % N;
           const p = (i + N - 1) % N;
 
-          const l0 = 1 * m;
-          const l_f = -2000;
-          const visc = 20;
+          const l0 = 30 * m / N;
+          const l_f = -40000;
+          const visc = 40 * N;
 
           ax[i] = prs * (y[n] - y[p]);
           ay[i] = -prs * (x[n] - x[p]);
+
+
+          ax[i] += gy * (y[i] - my) / 10;
+          ay[i] += -gy * (x[i] - mx) / 10;
+
+
 
           var dx = x[n] - x[i];
           var dy = y[n] - y[i];
@@ -110,8 +123,8 @@
 
         for (let i = 0; i < N; i++) {
 
-          vx[i] += dt * (ax[i] + gx * m);
-          vy[i] += dt * (ay[i] + gy * m);
+          vx[i] += dt * (ax[i] + 0 * gx * m);
+          vy[i] += dt * (ay[i] + 0 * gy * m + 10 * m);
           x[i] += dt * vx[i];// + 0.5 * dt * dt * ax[i];
           y[i] += dt * vy[i];// + 0.5 * dt * dt * ay[i];
           // Keep the ball within the canvas bounds
@@ -152,11 +165,11 @@
       for (let i = 0; i < N; i++) {
         context.beginPath();
         context.fillStyle = 'black';
-        context.arc(x[i], y[i], 0.2 * m, 0, Math.PI * 2);
+        context.arc(x[i], y[i], 10 * m / N, 0, Math.PI * 2);
         context.fill();
       }
-      // context.closePath();
-      // context.fill();
+      context.closePath();
+      context.fill();
       // Request the next frame
       requestAnimationFrame(update);
     }
