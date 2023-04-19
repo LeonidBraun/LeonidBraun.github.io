@@ -35,7 +35,7 @@
     var ay = [];
 
 
-    const m = canvas.width / 2;
+    const m = canvas.width / 20;
 
     N = 30
     for (let i = 0; i < N; i++) {
@@ -65,7 +65,7 @@
         const n = (i + 1) % N;
         const p = (i + N - 1) % N;
 
-        const l0 = 0.1 * m;
+        const l0 = 1 * m;
         const l_f = -500;
         const prs = 10;
         const visc = 10;
@@ -90,24 +90,28 @@
 
       for (let i = 0; i < N; i++) {
 
-        vx[i] += dt * (ax[i] + gx);
-        vy[i] += dt * (ay[i] + gy);
+        vx[i] += dt * (ax[i] + gx * m);
+        vy[i] += dt * (ay[i] + gy * m + 10 * m);
         x[i] += dt * vx[i];// + 0.5 * dt * dt * ax[i];
         y[i] += dt * vy[i];// + 0.5 * dt * dt * ay[i];
         // Keep the ball within the canvas bounds
         if (x[i] < 0) {
           x[i] = 0;
           vx[i] = -0.9 * vx[i];
+          vy[i] -= 0.9 * Math.sign(vy[i]) * Math.abs(vx[i]);
         } else if (x[i] > canvas.width) {
           x[i] = canvas.width;
           vx[i] = -0.9 * vx[i];
+          vy[i] -= 0.9 * Math.sign(vy[i]) * Math.abs(vx[i]);
         }
         if (y[i] < 0) {
           y[i] = 0;
           vy[i] = -0.9 * vy[i];
+          vx[i] -= 0.9 * Math.sign(vx[i]) * Math.abs(vy[i]);
         } else if (y[i] > canvas.height) {
           y[i] = canvas.height;
           vy[i] = -0.9 * vy[i];
+          vx[i] -= 0.9 * Math.sign(vx[i]) * Math.abs(vy[i]);
         }
         // Clear the canvas and redraw the ball
         // context.beginPath();
@@ -130,7 +134,7 @@
       for (let i = 0; i < N; i++) {
         context.beginPath();
         context.fillStyle = 'black';
-        context.arc(x[i], y[i], 0.02 * m, 0, Math.PI * 2);
+        context.arc(x[i], y[i], 0.2 * m, 0, Math.PI * 2);
         context.fill();
       }
       // context.closePath();
